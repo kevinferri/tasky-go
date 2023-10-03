@@ -9,6 +9,7 @@ import (
 
 func InitMiddleware(router *mux.Router) {
 	router.Use(loggingMiddleware, contentTypeApplicationJsonMiddleware)
+	log.Println("✅ Middleware")
 }
 
 func loggingMiddleware(next http.Handler) http.Handler {

@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"os"
 
 	"github.com/kevinferri/tasky-go/config"
 	_ "github.com/lib/pq"
@@ -18,10 +19,8 @@ type DBConnection struct {
 }
 
 func (dbc *DBConnection) getConnectionString() string {
-
 	return fmt.Sprintf("user=%s password=%s host=%s port=%s dbname=%s",
 		dbc.User, dbc.Password, dbc.Host, dbc.Port, dbc.DBName)
-
 }
 
 func InitDB() *sql.DB {
@@ -44,7 +43,20 @@ func InitDB() *sql.DB {
 		log.Fatal("Could not ping database:", err.Error())
 	}
 
-	log.Println("Connected to postgres database successfully")
+	curPath, _ := os.Getwd()
+	file, err := os.ReadFile(curPath + "/db/init.sql")
+
+	if err != nil {
+		log.Fatal("Could not read init.sql file:", err.Error())
+	}
+
+	_, migrationSql := db.Exec(string(file))
+
+	if migrationSql != nil {
+		log.Fatal("Could not execute init.sql:", err.Error())
+	}
+
+	log.Println("✅ Postgres")
 
 	return db
 }

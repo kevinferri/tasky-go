@@ -10,6 +10,7 @@ import (
 	"github.com/kevinferri/tasky-go/db"
 	"github.com/kevinferri/tasky-go/handlers"
 	"github.com/kevinferri/tasky-go/middleware"
+	"github.com/kevinferri/tasky-go/store"
 )
 
 type Server struct {
@@ -21,8 +22,9 @@ type Server struct {
 func (s *Server) Start() {
 	handlers.InitHandlers(s.Router)
 	middleware.InitMiddleware(s.Router)
+	store.InitStore(s.DB)
 
-	log.Println("Go server started on port", s.Port, "🚀")
+	log.Println("🚀", "Server running on port", s.Port)
 	log.Fatal(http.ListenAndServe("localhost:"+s.Port, s.Router))
 }
 

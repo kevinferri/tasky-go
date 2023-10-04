@@ -14,8 +14,7 @@ func InitMiddleware(router *mux.Router) {
 
 func loggingMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		log.Println(r.Host)
-
+		log.Println(r.Method, r.URL.RequestURI())
 		next.ServeHTTP(w, r)
 	})
 }

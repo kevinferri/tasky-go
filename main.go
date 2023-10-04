@@ -33,7 +33,7 @@ func main() {
 
 	server := &Server{
 		Port:   config.GetEnv("PORT"),
-		Router: mux.NewRouter(),
+		Router: mux.NewRouter().StrictSlash(true),
 		DB:     db.InitDB(),
 	}
 

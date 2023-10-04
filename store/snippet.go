@@ -1,20 +1,26 @@
 package store
 
-import (
-	"log"
-)
-
 type Snippet struct {
 	ID    string `json:"id"`
 	Title string `json:"title"`
 }
 
-func (s *Snippet) GetAll() ([]Snippet, error) {
+func GetSnippetById(id string) (Snippet, error) {
+	var snippet Snippet
+
+	query := `select * from snippets WHERE id=$1;`
+	row := db.QueryRow(query, id)
+	err := row.Scan(&snippet.ID, &snippet.Title)
+
+	return snippet, err
+}
+
+func GetAllSnippets() ([]Snippet, error) {
 	var snippets []Snippet
 
 	query := `select * from snippets;`
-
 	rows, err := db.Query(query)
+
 	if err != nil {
 		return snippets, err
 	}
@@ -22,8 +28,7 @@ func (s *Snippet) GetAll() ([]Snippet, error) {
 	defer rows.Close()
 
 	for rows.Next() {
-		var id string
-		var title string
+		var id, title string
 
 		err := rows.Scan(&id, &title)
 		if err != nil {
@@ -41,15 +46,9 @@ func (s *Snippet) GetAll() ([]Snippet, error) {
 	return snippets, nil
 }
 
-func (s *Snippet) Create() error {
+func CreateSnippet(s Snippet) error {
 	query := `insert into snippets(title) values($1);`
+	err := db.QueryRow(query, s.Title).Scan(&s.ID)
 
-	_, err := db.Exec(query, s.Title)
-
-	if err != nil {
-		log.Fatal("Could not create snippet:", err.Error())
-		return err
-	}
-
-	return nil
+	return err
 }

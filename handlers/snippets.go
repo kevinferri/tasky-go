@@ -9,8 +9,8 @@ import (
 	"github.com/kevinferri/tasky-go/store"
 )
 
-func getAllSnippets(w http.ResponseWriter, r *http.Request) {
-	snippets, err := store.GetAllSnippets()
+func (h *Handler) getAllSnippets(w http.ResponseWriter, r *http.Request) {
+	snippets, err := h.snippetStore.All()
 
 	if err != nil {
 		response.HandleErr(w, store.Snippet{}, err)
@@ -19,9 +19,9 @@ func getAllSnippets(w http.ResponseWriter, r *http.Request) {
 	response.JSON(w, snippets, http.StatusOK)
 }
 
-func getSnippetById(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) getSnippetById(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
-	s, err := store.GetSnippetById(params["id"])
+	s, err := h.snippetStore.ById(params["id"])
 
 	if err != nil {
 		response.HandleErr(w, s, err)
@@ -31,7 +31,7 @@ func getSnippetById(w http.ResponseWriter, r *http.Request) {
 	response.JSON(w, s, http.StatusOK)
 }
 
-func postSnippet(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) postSnippet(w http.ResponseWriter, r *http.Request) {
 	s := &store.Snippet{}
 	err := json.NewDecoder(r.Body).Decode(s)
 
@@ -39,6 +39,6 @@ func postSnippet(w http.ResponseWriter, r *http.Request) {
 		response.HandleErr(w, s, err)
 	}
 
-	store.CreateSnippet(s)
+	h.snippetStore.Create(s)
 	response.JSON(w, s, http.StatusCreated)
 }

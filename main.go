@@ -5,37 +5,22 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	"github.com/jmoiron/sqlx"
 	"github.com/kevinferri/tasky-go/config"
 	"github.com/kevinferri/tasky-go/db"
 	"github.com/kevinferri/tasky-go/handlers"
 	"github.com/kevinferri/tasky-go/middleware"
-	"github.com/kevinferri/tasky-go/store"
 )
-
-type Server struct {
-	Port   string
-	Router *mux.Router
-	DB     *sqlx.DB
-}
-
-func (s *Server) Start() {
-	handlers.InitHandlers(s.Router)
-	middleware.InitMiddleware(s.Router)
-	store.InitStore(s.DB)
-
-	log.Println("🚀", "Server running on port", s.Port)
-	log.Fatal(http.ListenAndServe("localhost:"+s.Port, s.Router))
-}
 
 func main() {
 	config.Init()
 
-	server := &Server{
-		Port:   config.GetEnv("PORT"),
-		Router: mux.NewRouter().StrictSlash(true),
-		DB:     db.InitDB(),
-	}
+	db := db.InitDB()
+	port := config.GetEnv("PORT")
+	router := mux.NewRouter().StrictSlash(true)
 
-	server.Start()
+	middleware.InitMiddleware(router)
+	handlers.InitHandlers(handlers.NewHandler(router, db))
+
+	log.Println("🚀", "Server running on port", port)
+	log.Fatal(http.ListenAndServe("localhost:"+port, router))
 }

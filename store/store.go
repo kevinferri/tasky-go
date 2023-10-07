@@ -1,14 +1,7 @@
 package store
 
-import (
-	"log"
+import "github.com/jmoiron/sqlx"
 
-	"github.com/jmoiron/sqlx"
-)
-
-var db *sqlx.DB
-
-func InitStore(sqlDb *sqlx.DB) {
-	db = sqlDb
-	log.Println("✅ Store")
+type Store struct {
+	db *sqlx.DB
 }

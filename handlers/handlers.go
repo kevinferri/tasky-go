@@ -1,34 +1,34 @@
 package handlers
 
 import (
-	"database/sql"
 	"log"
 	"net/http"
-	"reflect"
 
 	"github.com/gorilla/mux"
+	"github.com/jmoiron/sqlx"
+	"github.com/kevinferri/tasky-go/store"
 )
 
-func InitHandlers(r *mux.Router) {
-	// health_check
-	r.HandleFunc("/health_check", getHealthCheck).Methods(http.MethodGet)
-
-	// snippets
-	r.HandleFunc("/snippets", getAllSnippets).Methods(http.MethodGet)
-	r.HandleFunc("/snippets", postSnippet).Methods(http.MethodPost)
-	r.HandleFunc("/snippets/{id}", getSnippetById).Methods(http.MethodGet)
-
-	log.Println("✅ Handlers")
+type Handler struct {
+	router       *mux.Router
+	snippetStore *store.SnippetStore
 }
 
-func handleErrResp(i interface{}, w http.ResponseWriter, err error) {
-	t := reflect.TypeOf(i)
-
-	if err.Error() == sql.ErrNoRows.Error() {
-		http.Error(w, t.Name()+" not found", http.StatusNotFound)
-
+func NewHandler(router *mux.Router, db *sqlx.DB) *Handler {
+	return &Handler{
+		router:       router,
+		snippetStore: store.NewSnippetStore(db),
 	}
+}
 
-	log.Println("Handler error:", err.Error())
-	http.Error(w, "Bad request", http.StatusBadRequest)
+func InitHandlers(h *Handler) {
+	// health_check
+	h.router.HandleFunc("/health_check", h.getHealthCheck).Methods(http.MethodGet)
+
+	// snippets
+	h.router.HandleFunc("/snippets", h.getAllSnippets).Methods(http.MethodGet)
+	h.router.HandleFunc("/snippets", h.postSnippet).Methods(http.MethodPost)
+	h.router.HandleFunc("/snippets/{id}", h.getSnippetById).Methods(http.MethodGet)
+
+	log.Println("✅ Handlers")
 }

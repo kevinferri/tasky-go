@@ -13,6 +13,8 @@ func Init() {
 	if err != nil {
 		log.Fatalf("Error loading .env file")
 	}
+
+	log.Println("✅ Env")
 }
 
 func GetEnv(key string) string {

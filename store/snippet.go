@@ -1,54 +1,26 @@
 package store
 
 type Snippet struct {
-	ID    string `json:"id"`
-	Title string `json:"title"`
+	ID    string `db:"id" json:"id"`
+	Title string `db:"title" json:"title"`
 }
 
 func GetSnippetById(id string) (Snippet, error) {
-	var snippet Snippet
+	s := Snippet{}
+	err := db.Get(&s, "select id, title from snippets where id=$1", id)
 
-	query := `select * from snippets WHERE id=$1;`
-	row := db.QueryRow(query, id)
-	err := row.Scan(&snippet.ID, &snippet.Title)
-
-	return snippet, err
+	return s, err
 }
 
 func GetAllSnippets() ([]Snippet, error) {
-	var snippets []Snippet
+	ss := []Snippet{}
+	err := db.Select(&ss, "select id, title from snippets")
 
-	query := `select * from snippets;`
-	rows, err := db.Query(query)
-
-	if err != nil {
-		return snippets, err
-	}
-
-	defer rows.Close()
-
-	for rows.Next() {
-		var id, title string
-
-		err := rows.Scan(&id, &title)
-		if err != nil {
-			return snippets, err
-		}
-
-		snippet := Snippet{
-			ID:    id,
-			Title: title,
-		}
-
-		snippets = append(snippets, snippet)
-	}
-
-	return snippets, nil
+	return ss, err
 }
 
-func CreateSnippet(s Snippet) error {
-	query := `insert into snippets(title) values($1);`
-	err := db.QueryRow(query, s.Title).Scan(&s.ID)
+func CreateSnippet(s *Snippet) (Snippet, error) {
+	err := db.Get(s, "insert into snippets(title) values($1) returning id, title", s.Title)
 
-	return err
+	return *s, err
 }

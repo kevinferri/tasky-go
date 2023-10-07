@@ -1,10 +1,11 @@
 package handlers
 
 import (
-	"encoding/json"
 	"net/http"
+
+	"github.com/kevinferri/tasky-go/response"
 )
 
 func getHealthCheck(w http.ResponseWriter, r *http.Request) {
-	json.NewEncoder(w).Encode(map[string]string{"status": "ok"})
+	response.JSON(w, map[string]string{"status": "ok"}, http.StatusOK)
 }

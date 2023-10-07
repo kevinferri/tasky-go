@@ -1,11 +1,11 @@
 package main
 
 import (
-	"database/sql"
 	"log"
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"github.com/jmoiron/sqlx"
 	"github.com/kevinferri/tasky-go/config"
 	"github.com/kevinferri/tasky-go/db"
 	"github.com/kevinferri/tasky-go/handlers"
@@ -16,7 +16,7 @@ import (
 type Server struct {
 	Port   string
 	Router *mux.Router
-	DB     *sql.DB
+	DB     *sqlx.DB
 }
 
 func (s *Server) Start() {

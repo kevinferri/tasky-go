@@ -15,8 +15,8 @@ func InitHandlers(r *mux.Router) {
 
 	// snippets
 	r.HandleFunc("/snippets", getAllSnippets).Methods(http.MethodGet)
+	r.HandleFunc("/snippets", postSnippet).Methods(http.MethodPost)
 	r.HandleFunc("/snippets/{id}", getSnippetById).Methods(http.MethodGet)
-	r.HandleFunc("/snippets/new", postSnippet).Methods(http.MethodPost)
 
 	log.Println("✅ Handlers")
 }

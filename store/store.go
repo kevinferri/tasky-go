@@ -1,13 +1,14 @@
 package store
 
 import (
-	"database/sql"
 	"log"
+
+	"github.com/jmoiron/sqlx"
 )
 
-var db *sql.DB
+var db *sqlx.DB
 
-func InitStore(sqlDb *sql.DB) {
+func InitStore(sqlDb *sqlx.DB) {
 	db = sqlDb
 	log.Println("✅ Store")
 }

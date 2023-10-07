@@ -1,11 +1,11 @@
 package db
 
 import (
-	"database/sql"
 	"fmt"
 	"log"
 	"os"
 
+	"github.com/jmoiron/sqlx"
 	"github.com/kevinferri/tasky-go/config"
 	_ "github.com/lib/pq"
 )
@@ -23,7 +23,7 @@ func (dbc *DBConnection) getConnectionString() string {
 		dbc.User, dbc.Password, dbc.Host, dbc.Port, dbc.DBName)
 }
 
-func InitDB() *sql.DB {
+func InitDB() *sqlx.DB {
 	dbConn := DBConnection{
 		Host:     config.GetEnv("POSTGRES_URL"),
 		Port:     config.GetEnv("POSTGRES_PORT"),
@@ -32,7 +32,7 @@ func InitDB() *sql.DB {
 		DBName:   config.GetEnv("POSTGRES_DB"),
 	}
 
-	db, err := sql.Open("postgres", dbConn.getConnectionString())
+	db, err := sqlx.Connect("postgres", dbConn.getConnectionString())
 
 	if err != nil {
 		log.Fatal("Could not connect to the DB:", err.Error())
@@ -50,9 +50,9 @@ func InitDB() *sql.DB {
 		log.Fatal("Could not read init.sql file:", err.Error())
 	}
 
-	_, migrationSql := db.Exec(string(file))
+	_, schemaErr := db.Exec(string(file))
 
-	if migrationSql != nil {
+	if schemaErr != nil {
 		log.Fatal("Could not execute init.sql:", err.Error())
 	}
 

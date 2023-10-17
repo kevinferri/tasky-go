@@ -1,8 +1,6 @@
 package store
 
-import (
-	"github.com/jmoiron/sqlx"
-)
+import "github.com/jmoiron/sqlx"
 
 type Snippet struct {
 	ID    string `db:"id" json:"id"`
